@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button>hello world!私信模拟器</el-button>
+    <el-button>hello world!私信模拟器🤗</el-button>
     </div>
 </template>
 
