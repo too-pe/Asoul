@@ -1,5 +1,6 @@
 const resolve = dir => require('path').join(__dirname, dir)
 module.exports = {
+    publicPath: "./",
     configureWebpack: {
         resolve: {
             alias: {

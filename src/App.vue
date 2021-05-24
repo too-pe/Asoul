@@ -1,8 +1,8 @@
 <template>
   <div class="background">
     <el-row>
-      <el-col :span="8" :offset="8" class="container-outter">
-        <div class="header">{{status === "LIST"?"我的关注":character.NAME}}</div>
+      <el-col :span="6" :offset="9" class="container-outter">
+        <div class="header">{{status === "LIST"?"MY SUBSCRIBE":character.NAME}}</div>
         <div class="container-inner">
           <CharacterList
             v-if="status === 'LIST'"
@@ -49,12 +49,13 @@ export default {
   flex-direction: center;
 }
 .background .container-outter {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04)
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
+  border-radius: 40px;
 }
 .background .header{
   text-align: center;
-  color: white;
-  background: rgb(153, 163, 255);
+  color: rgb(119, 119, 119);
+  background: rgb(255, 255, 255);
   font-size: 30px;
   padding-top:10px;
   padding-bottom: 10px;

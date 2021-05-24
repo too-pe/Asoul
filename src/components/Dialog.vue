@@ -7,9 +7,11 @@
         class="item-container"
       >
         <el-col>
-          <el-button :class="dialogObjectStyle(item.object)" circle>{{
-            item.object[0]
-          }}</el-button>
+          <img
+            :src="require('../../public/photo/'+item.object+'.jpg')"
+            :class="dialogObjectStyle(item.object)"
+            class="img"
+          />
           <span :class="dialogItemStyle(item.object)">{{ item.text }}</span>
         </el-col>
       </el-row>
@@ -17,9 +19,10 @@
     <div class="handle-container">
       <el-select
         v-model="currentMessage"
-        clearable
         filterable
+        @change="sentMessage"
         class="handle-select"
+        placeholder="请输入关键词选择你想要发送的话："
       >
         <el-option
           v-for="(dialog, index) in character.DIALOG"
@@ -28,7 +31,21 @@
           >{{ dialog.MESSAGE }}</el-option
         >
       </el-select>
-      <el-button @click="sentMessage" type="primary">发送</el-button>
+      <br />
+      <el-button
+        @click="sentMessage"
+        type="primary"
+        circle
+        class="handle-sent"
+        icon="el-icon-upload2"
+      ></el-button>
+      <el-button
+        @click="clearMessage"
+        type="danger"
+        circle
+        class="handle-clear"
+        icon="el-icon-delete"
+      ></el-button>
     </div>
   </div>
 </template>
@@ -58,12 +75,15 @@ export default {
       );
     }
 
-    this.goDown()
+    this.goDown();
   },
-  updated(){
-    this.goDown()
+  updated() {
+    this.goDown();
   },
   methods: {
+    imgUrl(object){
+      return "../../public/photo/" + object +".jpg"
+    },
     sentMessage() {
       if (!this.currentMessage) return; //nothing to reply
 
@@ -88,13 +108,15 @@ export default {
       setTimeout(() => {
         if (reply) {
           this.dialogList.push({
-            object: this.character.NAME,
+            object: this.character.EN_NAME,
             text: reply,
           });
         }
+        db.save("dialogWith" + this.character.EN_NAME, this.dialogList);
       }, Math.ceil(Math.random() * 5000));
-
-      db.save("dialogWith" + this.character.EN_NAME, this.dialogList);
+    },
+    clearMessage() {
+      this.currentMessage = "";
     },
     changelikability(num) {
       this.character.LIKABILITY_NUM +=
@@ -126,7 +148,8 @@ export default {
         return "right-object";
       }
     },
-    goDown() { //页面滑到最底部
+    goDown() {
+      //页面滑到最底部
       this.$nextTick(() => {
         let msg = document.getElementById("inner"); // 获取对象
         msg.scrollTop = msg.scrollHeight; // 滚动高度
@@ -137,6 +160,11 @@ export default {
 </script>
 
 <style scoped>
+.img{
+  border-radius: 50%;
+  width:10%;
+  height:10%
+}
 .dialog-container {
   height: 450px;
   overflow: auto;
@@ -147,10 +175,14 @@ export default {
 .handle-container {
   height: 100px;
   margin: 10px;
+  text-align: center;
 }
 .handle-container .handle-select {
-  width: 350px;
+  width: 100%;
   padding-right: 10px;
+}
+.handle-container .handle-sent {
+  margin-top: 10px;
 }
 .el-input__suffix-inner {
   visibility: hidden;
@@ -163,7 +195,7 @@ export default {
   text-align: left;
   float: left;
   color: white;
-  background: rgb(174, 189, 255);
+  background: rgb(208, 216, 255);
   border-radius: 0px 20px 20px 20px;
   padding: 15px;
   max-width: 150px;
@@ -173,7 +205,7 @@ export default {
   text-align: right;
   float: right;
   color: white;
-  background: rgb(71, 255, 132);
+  background: rgb(116, 255, 162);
   border-radius: 20px 0px 20px 20px;
   padding: 15px;
   max-width: 150px;

@@ -1,4 +1,4 @@
-# gsb_business_web
+# 私信模拟器
 
 ## Project setup
 

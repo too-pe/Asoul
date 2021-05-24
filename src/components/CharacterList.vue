@@ -1,9 +1,9 @@
 <template>
   <div class="character-list-warp">
     <div v-for="(character, index) in characterList" :key="index">
-      <el-button @click="gotoDialogPage(character)" class="character-button">{{
+      <el-card @click.native="gotoDialogPage(character)" class="character-button"  shadow="hover">{{
         character.NAME
-      }}</el-button>
+      }}</el-card>
     </div>
   </div>
 </template>
@@ -30,16 +30,6 @@ export default {
   overflow: auto;
 }
 .character-button {
-  width: 100%;
-  text-align: start;
-  font-weight: bolder;
-  color: white;
-  background: rgb(255, 183, 193);
-  border-color: transparent;
-}
-.character-button:hover {
-  background: rgb(255, 137, 153);
-  color: white;
-  border-color: transparent;
+  margin:10px;
 }
 </style>
