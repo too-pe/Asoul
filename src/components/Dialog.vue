@@ -28,24 +28,42 @@
           v-for="(dialog, index) in character.DIALOG"
           :key="index"
           :value="dialog.MESSAGE"
-          >{{ dialog.MESSAGE }}</el-option
+          >{{handleMessage(dialog.MESSAGE)}}</el-option
         >
       </el-select>
       <br />
-      <el-button
-        @click="sentMessage"
-        type="primary"
-        circle
-        class="handle-sent"
-        icon="el-icon-upload2"
-      ></el-button>
-      <el-button
-        @click="clearMessage"
-        type="danger"
-        circle
-        class="handle-clear"
-        icon="el-icon-delete"
-      ></el-button>
+      <el-tooltip effect="dark" content="发送">
+        <el-button
+          @click="sentMessage"
+          circle
+          class="handle-sent"
+          icon="el-icon-upload2"
+        ></el-button>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="清空输入框">
+        <el-button
+          @click="clearMessage"
+          circle
+          class="handle-clear"
+          icon="el-icon-delete"
+        ></el-button>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="返回">
+        <el-button
+          @click="gotoListPage"
+          circle
+          class="handle-clear"
+          icon="el-icon-back"
+        ></el-button>
+      </el-tooltip>
+      <el-tooltip effect="dark" content="清空记忆">
+        <el-button
+          @click="clearMemory()"
+          circle
+          class="handle-clear"
+          icon="el-icon-error"
+        ></el-button>
+      </el-tooltip>
     </div>
   </div>
 </template>
@@ -62,7 +80,25 @@ export default {
     };
   },
   created() {
-    if (!db.get("dialogWith" + this.character.EN_NAME).length) {
+    this.getDialogList();
+    // setInterval(() => { //5s刷新一次
+    //   this.getDialogList();
+    // }, 5000)
+
+    this.goDown(); //下拉到最底层
+  },
+  updated() {
+    this.goDown();
+  },
+  methods: {
+    handleMessage(message){
+      if(message.length > 20){
+        return message.slice(0,20) + '...'
+      }
+      else return message
+    },
+    getDialogList(){
+      if (!db.get("dialogWith" + this.character.EN_NAME).length) {
       db.save("dialogWith" + this.character.EN_NAME, []);
       db.save(
         "likeWith" + this.character.EN_NAME,
@@ -74,13 +110,7 @@ export default {
         "likeWith" + this.character.EN_NAME
       );
     }
-
-    this.goDown();
-  },
-  updated() {
-    this.goDown();
-  },
-  methods: {
+    },
     imgUrl(object){
       return "../../public/photo/" + object +".jpg"
     },
@@ -90,6 +120,7 @@ export default {
       const currentDialog = this.character.DIALOG.find(
         (item) => item.MESSAGE === this.currentMessage
       );
+      console.log(currentDialog)
       const likability = this.changelikability(currentDialog.LIKABILITYCHANGE);
       console.log(likability);
       const replyGroup = currentDialog.REPLY[likability];
@@ -118,12 +149,26 @@ export default {
     clearMessage() {
       this.currentMessage = "";
     },
+    clearMemory(){
+      this.$confirm("你确定要清除"+this.character.NAME+"的记忆吗？","😰",{
+        type:"warning"
+      }).then(()=>{
+        db.save("dialogWith" + this.character.EN_NAME,[])
+        db.save("likeWith" + this.character.EN_NAME,50)
+        this.$message.success("重启世界中...")
+        setTimeout(()=>{
+          location.reload()
+        },2000)
+      })
+    },
     changelikability(num) {
+      console.log(num)
       this.character.LIKABILITY_NUM +=
         num * (Math.ceil(Math.random() * 10) - 4);
       if (this.character.LIKABILITY_NUM < 0) this.character.LIKABILITY_NUM = 0;
       if (this.character.LIKABILITY_NUM > 100)
         this.character.LIKABILITY_NUM = 100;
+        console.log(this.character.LIKABILITY_NUM)
       db.save(
         "likeWith" + this.character.EN_NAME,
         this.character.LIKABILITY_NUM
@@ -135,14 +180,14 @@ export default {
       else return "WORST";
     },
     dialogItemStyle(object) {
-      if (object === this.character.NAME) {
+      if (object === this.character.EN_NAME) {
         return "left";
       } else {
         return "right";
       }
     },
     dialogObjectStyle(object) {
-      if (object === this.character.NAME) {
+      if (object === this.character.EN_NAME) {
         return "left-object";
       } else {
         return "right-object";
@@ -155,6 +200,9 @@ export default {
         msg.scrollTop = msg.scrollHeight; // 滚动高度
       });
     },
+    gotoListPage(){
+      this.$emit("gotoListPage");
+    }
   },
 };
 </script>
@@ -177,6 +225,9 @@ export default {
   margin: 10px;
   text-align: center;
 }
+.handle-container >>> .el-select-dropdown__list{
+  max-width: 30px;
+}
 .handle-container .handle-select {
   width: 100%;
   padding-right: 10px;
@@ -194,22 +245,26 @@ export default {
 .left {
   text-align: left;
   float: left;
-  color: white;
-  background: rgb(208, 216, 255);
+  color: rgb(141, 141, 141);
+  background: rgb(235, 235, 235);
   border-radius: 0px 20px 20px 20px;
   padding: 15px;
   max-width: 150px;
-  width: fit-content;
+  font-weight: bolder;
+  margin-top:5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .right {
   text-align: right;
   float: right;
   color: white;
-  background: rgb(116, 255, 162);
+  background: rgb(131, 131, 131);
   border-radius: 20px 0px 20px 20px;
   padding: 15px;
+  margin-top:5px;
   max-width: 150px;
-  width: fit-content;
+  font-weight: bolder;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
 }
 .left-object {
   float: left;

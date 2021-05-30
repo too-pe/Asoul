@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import CHARACTERLIST from "../constants/CharacterList";
+import CHARACTERLIST from "../../public/constants/CharacterList";
 export default {
   data() {
     return {
@@ -26,7 +26,7 @@ export default {
 
 <style>
 .character-list-warp{
-  height: 550px;
+  height: 570px;
   overflow: auto;
 }
 .character-button {

@@ -30,10 +30,11 @@ export const AVA_DIALOG = [{
     LIKABILITYCHANGE: 3
 }]
 
+
 export const AVA = {
     NAME: "Ava",
     EN_NAME: "Ava",
     LIKABILITY_NUM: 5,
-    DIALOG: AVA_DIALOG
+    DIALOG: AVA_DIALOG,
 }
 export default AVA
