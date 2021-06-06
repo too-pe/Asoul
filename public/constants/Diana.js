@@ -79,6 +79,7 @@ export const DIANA_DIALOG = [{
 export const DIANA = {
     NAME: "Diana",
     EN_NAME: "Diana",
+    SIGN: "你好！",
     LIKABILITY_NUM: 50,
     DIALOG: DIANA_DIALOG,
 }

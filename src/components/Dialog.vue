@@ -1,20 +1,22 @@
 <template>
   <div class="dialog-warp">
     <div class="dialog-container" id="inner">
-      <el-row
-        v-for="(item, index) in dialogList"
-        :key="index"
-        class="item-container"
-      >
-        <el-col>
-          <img
-            :src="require('../../public/photo/'+item.object+'.jpg')"
-            :class="dialogObjectStyle(item.object)"
-            class="img"
-          />
-          <span :class="dialogItemStyle(item.object)">{{ item.text }}</span>
-        </el-col>
-      </el-row>
+      <transition-group name="slide-fade">
+        <el-row
+          v-for="(item, index) in dialogList"
+          :key="index"
+          class="item-container"
+        >
+          <el-col>
+            <img
+              :src="require('../../public/photo/'+item.object+'.jpg')"
+              :class="dialogObjectStyle(item.object)"
+              class="img"
+            />
+            <span :class="dialogItemStyle(item.object)">{{ item.text }}</span>
+          </el-col>
+        </el-row>
+      </transition-group>
     </div>
     <div class="handle-container">
       <el-select
@@ -36,6 +38,7 @@
         <el-button
           @click="sentMessage"
           circle
+          type="primary"
           class="handle-sent"
           icon="el-icon-upload2"
         ></el-button>
@@ -44,6 +47,7 @@
         <el-button
           @click="clearMessage"
           circle
+          type="success"
           class="handle-clear"
           icon="el-icon-delete"
         ></el-button>
@@ -52,6 +56,7 @@
         <el-button
           @click="gotoListPage"
           circle
+          type="warning"
           class="handle-clear"
           icon="el-icon-back"
         ></el-button>
@@ -60,6 +65,7 @@
         <el-button
           @click="clearMemory()"
           circle
+          type="danger"
           class="handle-clear"
           icon="el-icon-error"
         ></el-button>
@@ -214,8 +220,8 @@ export default {
   height:10%
 }
 .dialog-container {
-  height: 450px;
-  overflow: auto;
+  height: 375px;
+  overflow: scroll;
   margin: 5px;
   background: rgb(248, 248, 248);
   border-radius: 10px;
