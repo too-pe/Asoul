@@ -1,9 +1,12 @@
 <template>
   <div class="background">
     <el-row>
-      <el-col>
+      <div>
         <transition name="fade" mode="out-in">
-          <el-col class="container-header" v-show="headerShow">
+          <div v-if="!headerStartShow" key="before" class="container-before">
+            <h2 class="container-before-title">For Asoul.</h2>
+            </div>
+          <div class="container-header" v-if="headerShow && headerStartShow" key="header">
             <h1 class="title">私信模拟器</h1>
             <el-button
               @click="handleContainerStyle"
@@ -13,52 +16,38 @@
               class="start-button"
               >开始</el-button
             >
-          </el-col>
+          </div>
+
+          <div class="main-container" v-if="!headerShow" key="main">
+            <div class="container-outter">
+              <div class="header">
+                {{ status === "LIST" ? "关注" : character.NAME }}
+              </div>
+              <div class="container-inner">
+                <transition name="fade" mode="out-in">
+                  <CharacterList
+                    v-if="status === 'LIST'"
+                    @gotoDialogPage="gotoDialogPage"
+                    @handleContainerStyle="handleContainerStyle"
+                    @handleSettingStyle="handleSettingStyle"
+                  />
+                  <Dialog
+                    v-if="status === 'DIALOG'"
+                    @gotoListPage="gotoListPage"
+                    :objectCharacter="character"
+                  />
+                </transition>
+              </div>
+            </div>
+          </div>
         </transition>
-      </el-col>
-      <el-col :class="containerStyle">
-        <div class="container-outter">
-          <div class="header">
-            {{ status === "LIST" ? "关注" : character.NAME }}
-          </div>
-          <div class="container-inner">
-            <transition name="fade" mode="out-in">
-              <CharacterList
-                v-if="status === 'LIST'"
-                @gotoDialogPage="gotoDialogPage"
-              />
-              <Dialog
-                v-if="status === 'DIALOG'"
-                @gotoListPage="gotoListPage"
-                :objectCharacter="character"
-              />
-            </transition>
-            <transition name="slide-fade">
-              <Setting v-if="settingStatus"/>
-            </transition>
-            <div class="header-button">
-              <el-tooltip effect="dark" content="关闭">
-                <el-button
-                  @click="handleContainerStyle"
-                  circle
-                  type="danger"
-                  icon="el-icon-message-solid"
-                ></el-button>
-              </el-tooltip>
-            </div>
-            <div class="setting-button">
-              <el-tooltip effect="dark" content="设置">
-                <el-button
-                  @click="handleSettingStatus"
-                  circle
-                  type="warning"
-                  icon="el-icon-s-tools"
-                ></el-button>
-              </el-tooltip>
-            </div>
-          </div>
+        <transition name="slide-fade">
+          <Setting v-if="settingStatus" @handleDialog="handleDialog" />
+        </transition>
+        <div class="dialogs">
+          <Object :status="dialogStatus.object" @handleDialog="handleDialog" />
         </div>
-      </el-col>
+      </div>
     </el-row>
   </div>
 </template>
@@ -67,6 +56,7 @@
 import Dialog from "./components/Dialog";
 import CharacterList from "./components/CharacterList";
 import Setting from "./components/Setting";
+import Object from "./components/Object.vue";
 // import CHARACTERLIST from "./constants/CharacterList";
 // import db from "./utils/loaclStorage";
 
@@ -74,7 +64,8 @@ export default {
   components: {
     Dialog,
     CharacterList,
-    Setting
+    Setting,
+    Object,
   },
   data() {
     return {
@@ -82,11 +73,17 @@ export default {
       status: "LIST",
       containerStyle: "container-down",
       headerShow: true,
+      headerStartShow: false,
       settingStatus: false,
+      dialogStatus: {
+        object: false,
+      },
     };
   },
   created() {
-    // this.autoMessage();
+    setTimeout(()=>{
+      this.headerStartShow = true
+    }, 1000)
   },
   methods: {
     // autoMessage() {
@@ -137,38 +134,28 @@ export default {
       this.character = character;
       console.log(character);
       this.status = "BUFFER"; //动画缓冲
-      
-        this.status = "DIALOG"
-    
-     
-      
+
+      this.status = "DIALOG";
     },
     gotoListPage() {
-      
-        this.status = "LIST"
-      
+      this.status = "LIST";
     },
     handleContainerStyle() {
-      if (this.containerStyle === "container-down") {
-        this.headerShow = false;
-        setTimeout(() => {
-          this.containerStyle = "container-up";
-        }, 300);
-      } else {
-        setTimeout(() => {
-          this.headerShow = true;
-        }, 300);
-        this.containerStyle = "container-down";
+      this.headerShow = !this.headerShow;
+      if (this.headerShow) {
+        this.settingStatus = false;
       }
     },
-    handleSettingStatus(){
-      this.settingStatus = !this.settingStatus
-    }
+    handleSettingStyle() {
+      this.settingStatus = !this.settingStatus;
+    },
+    handleDialog(dialogName) {
+      this.dialogStatus[dialogName] = !this.dialogStatus[dialogName];
+    },
   },
 };
 </script>
 <style>
-
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.5s;
@@ -178,10 +165,10 @@ export default {
 }
 
 .slide-fade-enter-active {
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 .slide-fade-leave-active {
-  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+  transition: all 0.3s cubic-bezier(1, 0.5, 0.8, 1);
 }
 .slide-fade-enter, .slide-fade-leave-to
 /* .slide-fade-leave-active for below version 2.1.8 */ {
@@ -213,27 +200,31 @@ body {
   background-image: url("~assets/common/background/background5.jpg");
   background-size: 100% 100%;
 }
-.background .header-button {
-  text-align: center;
-  padding-bottom: 20px;
-  position: fixed;
-  bottom:2%;
-  right:15%;
-  z-index: 10;
+.background .handle-button {
+  flex-direction: row-reverse;
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: center;
 }
 .background .setting-button {
+  padding: 5px;
+}
+.background .container-before{
+  margin: auto;
   text-align: center;
-  padding-bottom: 20px;
-  position: fixed;
-  bottom:2%;
-  right:35%;
-  z-index: 10;
+  padding-top: 250px;
+  background: white;
+  height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+.background .container-before-title{
+  margin: auto;
 }
 .background .container-header {
+  margin: auto;
+  padding-top: 100px;
   text-align: center;
-  position: fixed;
-  right: 28%;
-  top: 20%;
   width: 600px;
 }
 .background .container-header .title {
@@ -241,28 +232,19 @@ body {
   color: white;
   font-family: FZYaoti;
 }
-.background .container-down {
-  right: -1350px;
-  bottom: -10px;
+.background .main-container {
   position: relative;
-  transform: translateX(3px);
-  transition: transform 0.3s ease-in-out, right 1s ease-in-out;
-  width: 230px;
-}
-.background .container-up {
-  right: -550px;
-  bottom: -10px;
-  position: relative;
-  transform: translateX(3px);
-  transition: transform 0.3s ease-in-out, right 1s ease-in-out;
-  width: 230px;
+  max-width: 300px;
+  margin: auto;
+  padding-top: 20px;
+  z-index: 1;
 }
 .background .container-outter {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
   border-radius: 40px;
   background: white;
   min-width: 300px;
-  height:620px;
+  height: 620px;
 }
 .background .header {
   text-align: center;
@@ -275,7 +257,7 @@ body {
 }
 
 .start-button {
-  font-size:20px;
+  font-size: 20px;
   font-family: FZYaoti;
 }
 .start-button span {
@@ -285,7 +267,7 @@ body {
   transition: 0.5s;
 }
 .start-button span:after {
-  content: '»';
+  content: "»";
   position: absolute;
   opacity: 0;
   top: 0;
@@ -300,5 +282,12 @@ body {
 .start-button:hover span:after {
   opacity: 1;
   right: 0;
+}
+
+.container-calandar {
+  position: fixed;
+  left: 50%;
+  width: 50%;
+  height: 50%;
 }
 </style>

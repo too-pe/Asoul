@@ -25,6 +25,7 @@
         @change="sentMessage"
         class="handle-select"
         placeholder="请输入关键词选择你想要发送的话："
+        clearable="true"
       >
         <el-option
           v-for="(dialog, index) in character.DIALOG"
@@ -43,33 +44,15 @@
           icon="el-icon-upload2"
         ></el-button>
       </el-tooltip>
-      <el-tooltip effect="dark" content="清空输入框">
-        <el-button
-          @click="clearMessage"
-          circle
-          type="success"
-          class="handle-clear"
-          icon="el-icon-delete"
-        ></el-button>
-      </el-tooltip>
       <el-tooltip effect="dark" content="返回">
-        <el-button
-          @click="gotoListPage"
-          circle
-          type="warning"
-          class="handle-clear"
-          icon="el-icon-back"
-        ></el-button>
-      </el-tooltip>
-      <el-tooltip effect="dark" content="清空记忆">
-        <el-button
-          @click="clearMemory()"
-          circle
-          type="danger"
-          class="handle-clear"
-          icon="el-icon-error"
-        ></el-button>
-      </el-tooltip>
+            <el-button
+              @click="gotoListPage"
+              circle
+              type="warning"
+              class="handle-clear"
+              icon="el-icon-back"
+            ></el-button>
+          </el-tooltip>
     </div>
   </div>
 </template>
